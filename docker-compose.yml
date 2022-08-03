@@ -6,8 +6,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=Baha
-      - POSTGRES_PASSWORD=BaHa1206
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=Motivator
     ports:
       - 5432:5432
