@@ -1,3 +1,4 @@
+from math import ceil
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, ListView
 from .forms import UserCreationForm, MotivationCreateForm
@@ -43,7 +44,12 @@ class MotivationList(ListView):
         response = requests.get('http://motivations:9000/motivations/', headers=headers, params=params)
         page_obj = response.json()
         motivations = page_obj['results']
-        return render(request, self.template_name, {'motivations':motivations})
+        pages_count = ceil(page_obj['count']/5)
+        context = {
+            'motivations': motivations,
+            'range': range(1, pages_count+1)
+        }
+        return render(request, self.template_name, context)
 
 class DetailMotivationList(ListView):
     template_name = 'motivation_id.html'
@@ -70,23 +76,27 @@ class RandomMotivation(ListView):
         random_motivation = response.json()
         return render(request, self.template_name, {'random_motivation': random_motivation})
 
-    
-def add_motivation(request):
+
+def get_data(request):
     template = 'post.html'
     form = MotivationCreateForm(request.POST)
 
     if form.is_valid():
-        new_motivaion = form.cleaned_data.get('motivation')
+        motivation = form.cleaned_data.get('motivation')
         user = request.user.username
-        headers = {
-            'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
-        }
-        response = requests.post('http://motivations:9000/motivations/',headers=headers, json={
-            'nickname': user,
-            'motivation': new_motivaion
-        })
+        add_motivation(motivation, user)
         return redirect('main')
     context = {
         'form': form
     }
     return render(request, template, context)
+
+
+def add_motivation(motivation, user):
+    headers = {
+        'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
+    }
+    response = requests.post('http://motivations:9000/motivations/', headers=headers, json={
+        'nickname': user,
+        'motivation': motivation
+    })
