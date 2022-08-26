@@ -70,29 +70,23 @@ class RandomMotivation(ListView):
         random_motivation = response.json()
         return render(request, self.template_name, {'random_motivation': random_motivation})
 
+    
+def add_motivation(request):
+    template = 'post.html'
+    form = MotivationCreateForm(request.POST)
 
-class MotivationCreate(CreateView):
-    template_name = 'post.html'
-
-    def get(self, request):
-        form = MotivationCreateForm
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request):
-        form = MotivationCreateForm(request.POST)
-
-        if form.is_valid():
-            new_motivaion = form.cleaned_data.get('motivation')
-            user = request.user.username
-            headers = {
+    if form.is_valid():
+        new_motivaion = form.cleaned_data.get('motivation')
+        user = request.user.username
+        headers = {
             'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
         }
-            response = requests.post('http://motivations:9000/motivations/',headers=headers, json={
-                'nickname': user,
-                'motivation': new_motivaion
-            })
-            return redirect('main')
-        context = {
-            'form': form
-        }
-        return render(request, self.template_name, context)
+        response = requests.post('http://motivations:9000/motivations/',headers=headers, json={
+            'nickname': user,
+            'motivation': new_motivaion
+        })
+        return redirect('main')
+    context = {
+        'form': form
+    }
+    return render(request, template, context)
