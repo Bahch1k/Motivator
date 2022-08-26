@@ -2,15 +2,9 @@
 
 {% block content %}
 
-{% if motivation %}
-   {% for el in motivation %}
       <div class='alert alert-warning mt-4'>
-         <h4>{{ el.nickname }}</h4>
-         <h6>{{ el.motivation }}</h6>
+         <h4>{{ nickname }}</h4>
+         <h6>{{ motivation }}</h6>
       </div>
-   {% endfor %}
-{% else %}
-   <p>Записи отсутствуют</p>
-{% endif %}
 
 {% endblock  %}

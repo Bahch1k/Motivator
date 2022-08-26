@@ -37,9 +37,13 @@ class MotivationList(ListView):
         headers = {
             'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
         }
-        response = requests.get('http://motivations:9000/motivations/', headers=headers)
-        page_obj = response.json
-        return render(request, self.template_name, {'page_obj':page_obj})
+        params = {
+            'page' : request.GET.get('page')
+        }
+        response = requests.get('http://motivations:9000/motivations/', headers=headers, params=params)
+        page_obj = response.json()
+        motivations = page_obj['results']
+        return render(request, self.template_name, {'motivations':motivations})
 
 class DetailMotivationList(ListView):
     template_name = 'motivation_id.html'
@@ -51,7 +55,7 @@ class DetailMotivationList(ListView):
         url = 'http://motivations:9000/motivations/'
         response = requests.get(url + str(id), headers=headers)
         motivation = response.json()
-        return render(request, self.template_name, {'motivation': motivation})
+        return render(request, self.template_name, context = motivation)
 
 
 class RandomMotivation(ListView):
@@ -83,7 +87,7 @@ class MotivationCreate(CreateView):
             headers = {
             'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
         }
-            response = requests.post('http://motivations:9000/motivations/new',headers=headers, json={
+            response = requests.post('http://motivations:9000/motivations/',headers=headers, json={
                 'nickname': user,
                 'motivation': new_motivaion
             })
