@@ -1,31 +1,37 @@
 version: '3.8'
 
 services:
-  db:
+  db-pg:
     image: postgres:14.3
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=Baha
-      - POSTGRES_PASSWORD=BaHa1206
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=Motivator
     ports:
       - 5432:5432
 
-  app:
+  app-users:
     container_name: motivator_users
     build: .
     command: sh -c "python motivator/manage.py migrate && python motivator/manage.py runserver 0.0.0.0:8000"
 
     depends_on:
-      - db
+      - db-pg
       
     volumes:
       - ./motivator:/motivator_users
 
     ports:
       - 8000:8000
+      - 3000:3000
 
 volumes:
   postgres_data:
   motivator:
+
+networks:
+  default:
+    external:
+      name: motivation-network

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<form action="{% url 'motivations' %}" method='post'>
+    {% csrf_token %}
+    {{ form.motivation }}
+    <button type="submit" class="btn btn-success mt-4">Отправить</button>
+</form>
+{% endblock %}

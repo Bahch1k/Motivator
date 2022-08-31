@@ -1,8 +1,12 @@
 from django.shortcuts import redirect, render
-from django.views.generic import CreateView
-from .forms import UserCreationForm
+from django.views.generic import CreateView, ListView
+from .forms import UserCreationForm, MotivationCreateForm
 from django.contrib.auth import authenticate, login
+import requests
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class Register(CreateView):
     template_name = 'registration/register.html'
@@ -22,6 +26,78 @@ class Register(CreateView):
             user = authenticate(username=username, password=password)
             login(request, user)
             return redirect('home')
+        context = {
+            'form': form
+        }
+        return render(request, self.template_name, context)
+
+
+class MotivationList(ListView):
+    
+    template_name = 'main.html'
+
+    def get(self, request):
+        headers = {
+            'Authorization': os.getenv('API-KEY', '')
+        }
+        params = {
+            'page' : request.GET.get('page')
+        }
+        url = os.getenv('API-URL', '')
+        response = requests.get(url, headers=headers, params=params)
+        page_obj = response.json()
+        motivations = page_obj['results']
+        return render(request, self.template_name, {'motivations':motivations})
+
+class DetailMotivationList(ListView):
+    template_name = 'motivation_id.html'
+
+    def get(self, request, id):
+        headers = {
+            'Authorization': os.getenv('API-KEY', '')
+        }
+        url = os.getenv('API-URL', '')
+        response = requests.get(url + str(id), headers=headers)
+        motivation = response.json()
+        return render(request, self.template_name, context = motivation)
+
+
+class RandomMotivation(ListView):
+
+    template_name = 'home.html'
+
+    def get(self, request):
+        headers = {
+            'Authorization': os.getenv('API-KEY', '')
+        }
+        url = os.getenv('API-URL-RANDOM', '')
+        response = requests.get(url, headers=headers)
+        random_motivation = response.json()
+        return render(request, self.template_name, {'random_motivation': random_motivation})
+
+
+class MotivationCreate(CreateView):
+    template_name = 'post.html'
+
+    def get(self, request):
+        form = MotivationCreateForm
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = MotivationCreateForm(request.POST)
+
+        if form.is_valid():
+            new_motivaion = form.cleaned_data.get('motivation')
+            user = request.user.username
+            headers = {
+            'Authorization': os.getenv('API-KEY', '')
+            }
+            url = os.getenv('API-URL', '')
+            response = requests.post(url,headers=headers, json={
+                'nickname': user,
+                'motivation': new_motivaion
+            })
+            return redirect('main')
         context = {
             'form': form
         }

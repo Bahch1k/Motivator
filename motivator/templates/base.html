@@ -11,6 +11,9 @@
             <li class="list-group-item">
                 {% if user.is_authenticated %}
                     <a href={% url 'logout' %}>Выйти</a>
+                    <li class="list-group-item">
+                        <a href={% url 'main' %}>Посмотреть мотивации</a> | <a href={% url 'motivations' %}>Написать мотивацию</a>
+                    </li>
                 {% else %}
                     <a href={% url 'register' %}>Регистрация</a> | <a href={% url 'login' %}>Войти</a>
                 {% endif %}
