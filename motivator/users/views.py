@@ -90,7 +90,8 @@ def get_form_data(request):
     if form.is_valid():
         motivation = form.cleaned_data.get('motivation')
         user = request.user.username
-        if request.user is None:
+        if request.user.is_anonymous:
+            user = 'Anonymous'
             visibility = False
         else:
             visibility = True
