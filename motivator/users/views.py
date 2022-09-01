@@ -100,12 +100,10 @@ def get_data(request):
 
 def add_motivation(motivation, user):
     headers = {
-        'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
-        #TODO: Get Api-key via env. variables after merging branch add_function to main
+        'Authorization': os.getenv('API-KEY', '')
     }
-    response = requests.post('http://motivations:9000/motivations/',  headers=headers, json={
+    url = os.getenv('API-URL', '')
+    response = requests.post(url,  headers=headers, json={
         'nickname': user,
         'motivation': motivation
     })
-    #TODO: Get api-url via env. variables after merging branch add_function to main
-
