@@ -1,3 +1,4 @@
+from math import ceil
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, ListView
 from .forms import UserCreationForm, MotivationCreateForm
@@ -47,7 +48,12 @@ class MotivationList(ListView):
         response = requests.get(url, headers=headers, params=params)
         page_obj = response.json()
         motivations = page_obj['results']
-        return render(request, self.template_name, {'motivations':motivations})
+        pages_count = ceil(page_obj['count']/5)
+        context = {
+            'motivations': motivations,
+            'range': range(1, pages_count+1)
+        }
+        return render(request, self.template_name, context)
 
 class DetailMotivationList(ListView):
     template_name = 'motivation_id.html'
@@ -76,29 +82,31 @@ class RandomMotivation(ListView):
         return render(request, self.template_name, {'random_motivation': random_motivation})
 
 
-class MotivationCreate(CreateView):
-    template_name = 'post.html'
+def get_data(request):
+    template = 'post.html'
+    form = MotivationCreateForm(request.POST)
 
-    def get(self, request):
-        form = MotivationCreateForm
-        return render(request, self.template_name, {'form': form})
+    if form.is_valid():
+        motivation = form.cleaned_data.get('motivation')
+        user = request.user.username
+        add_motivation(motivation, user)
+        return redirect('main')
+    context = {
+        'form': form
+    }
+    return render(request, template, context)
 
-    def post(self, request):
-        form = MotivationCreateForm(request.POST)
 
-        if form.is_valid():
-            new_motivaion = form.cleaned_data.get('motivation')
-            user = request.user.username
-            headers = {
-            'Authorization': os.getenv('API-KEY', '')
-            }
-            url = os.getenv('API-URL', '')
-            response = requests.post(url,headers=headers, json={
-                'nickname': user,
-                'motivation': new_motivaion
-            })
-            return redirect('main')
-        context = {
-            'form': form
-        }
-        return render(request, self.template_name, context)
+
+
+def add_motivation(motivation, user):
+    headers = {
+        'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
+        #TODO: Get Api-key via env. variables after merging branch add_function to main
+    }
+    response = requests.post('http://motivations:9000/motivations/',  headers=headers, json={
+        'nickname': user,
+        'motivation': motivation
+    })
+    #TODO: Get api-url via env. variables after merging branch add_function to main
+

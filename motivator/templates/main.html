@@ -13,10 +13,10 @@
    <p>Записи отсутствуют</p>
 {% endif %}
 <div class='pagination'>
-   <span class='step-links'>
-         <a href='?page=1'>&laquo; Первая страница</a>
-         <a href='?page=2'>Вторая страница &raquo;</a>
-
-   </span>
+   <ul class='pagination'>
+         {% for p in range %}
+            <li class='page-item'><a class='page-link' href='?page={{ p }}'>{{ p }}</a></li>
+         {% endfor %}
+   </ul>
 </div>
 {% endblock  %}
