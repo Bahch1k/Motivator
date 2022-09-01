@@ -4,7 +4,10 @@ from django.views.generic import CreateView, ListView
 from .forms import UserCreationForm, MotivationCreateForm
 from django.contrib.auth import authenticate, login
 import requests
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class Register(CreateView):
     template_name = 'registration/register.html'
@@ -36,12 +39,13 @@ class MotivationList(ListView):
 
     def get(self, request):
         headers = {
-            'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
+            'Authorization': os.getenv('API-KEY', '')
         }
         params = {
             'page' : request.GET.get('page')
         }
-        response = requests.get('http://motivations:9000/motivations/', headers=headers, params=params)
+        url = os.getenv('API-URL', '')
+        response = requests.get(url, headers=headers, params=params)
         page_obj = response.json()
         motivations = page_obj['results']
         pages_count = ceil(page_obj['count']/5)
@@ -56,9 +60,9 @@ class DetailMotivationList(ListView):
 
     def get(self, request, id):
         headers = {
-            'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
+            'Authorization': os.getenv('API-KEY', '')
         }
-        url = 'http://motivations:9000/motivations/'
+        url = os.getenv('API-URL', '')
         response = requests.get(url + str(id), headers=headers)
         motivation = response.json()
         return render(request, self.template_name, context = motivation)
@@ -70,11 +74,13 @@ class RandomMotivation(ListView):
 
     def get(self, request):
         headers = {
-            'Authorization': ')tt1bNA71hEja@:RJoFb+cb:GnD)Zmx8'
+            'Authorization': os.getenv('API-KEY', '')
         }
-        response = requests.get('http://motivations:9000/motivations/random', headers=headers)
+        url = os.getenv('API-URL-RANDOM', '')
+        response = requests.get(url, headers=headers)
         random_motivation = response.json()
         return render(request, self.template_name, {'random_motivation': random_motivation})
+
 
 
 def get_data(request):
