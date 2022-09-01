@@ -82,6 +82,7 @@ class RandomMotivation(ListView):
         return render(request, self.template_name, {'random_motivation': random_motivation})
 
 
+
 def get_data(request):
     template = 'post.html'
     form = MotivationCreateForm(request.POST)
@@ -95,8 +96,6 @@ def get_data(request):
         'form': form
     }
     return render(request, template, context)
-
-
 
 
 def add_motivation(motivation, user):
