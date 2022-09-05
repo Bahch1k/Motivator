@@ -91,8 +91,8 @@ def get_form_data(request):
         motivation = form.cleaned_data.get('motivation')
         user = request.user.username
         if request.user.is_anonymous:
-            user = 'Anonymous'
             visibility = False
+            send_motivation_to_messenger(motivation)
         else:
             visibility = True
         add_motivation(motivation, user, visibility)
@@ -113,3 +113,7 @@ def add_motivation(motivation, user, visibility):
         'motivation': motivation,
         'is_visible': visibility
     })
+    return response
+def send_motivation_to_messenger(motivation):
+    pass
+#TODO: Add function logic after solution what messenger will be use.
