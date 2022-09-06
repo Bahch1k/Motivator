@@ -21,7 +21,8 @@ services:
       - db-pg
       
     volumes:
-      - ./motivator:/motivator_users
+      - ./motivator:/Motivator_users
+      - ./logs:/var/log
 
     ports:
       - 8000:8000
