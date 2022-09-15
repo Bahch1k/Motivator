@@ -15,7 +15,7 @@
                         <a href={% url 'main' %}>Посмотреть мотивации</a> | <a href={% url 'motivations' %}>Написать мотивацию</a>
                     </li>
                 {% else %}
-                    <a href={% url 'register' %}>Регистрация</a> | <a href={% url 'login' %}>Войти</a>
+                    <a href={% url 'register' %}>Регистрация</a> | <a href={% url 'login' %}>Войти</a> | <a href={% url 'motivations' %}>Написать мотивацию</a>
                 {% endif %}
             </li>
             <li class="list-group-item">

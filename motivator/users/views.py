@@ -39,12 +39,12 @@ class MotivationList(ListView):
 
     def get(self, request):
         headers = {
-            'Authorization': os.getenv('API-KEY', '')
+            'Authorization': os.getenv('API_KEY', '')
         }
         params = {
             'page' : request.GET.get('page')
         }
-        url = os.getenv('API-URL', '')
+        url = os.getenv('API_URL', '')
         response = requests.get(url, headers=headers, params=params)
         page_obj = response.json()
         motivations = page_obj['results']
@@ -60,9 +60,9 @@ class DetailMotivationList(ListView):
 
     def get(self, request, id):
         headers = {
-            'Authorization': os.getenv('API-KEY', '')
+            'Authorization': os.getenv('API_KEY', '')
         }
-        url = os.getenv('API-URL', '')
+        url = os.getenv('API_URL', '')
         response = requests.get(url + str(id), headers=headers)
         motivation = response.json()
         return render(request, self.template_name, context = motivation)
@@ -74,23 +74,28 @@ class RandomMotivation(ListView):
 
     def get(self, request):
         headers = {
-            'Authorization': os.getenv('API-KEY', '')
+            'Authorization': os.getenv('API_KEY', '')
         }
-        url = os.getenv('API-URL-RANDOM', '')
+        url = os.getenv('API_URL_RANDOM', '')
         response = requests.get(url, headers=headers)
         random_motivation = response.json()
         return render(request, self.template_name, {'random_motivation': random_motivation})
 
 
 
-def get_data(request):
+def get_form_data(request):
     template = 'post.html'
     form = MotivationCreateForm(request.POST)
 
     if form.is_valid():
         motivation = form.cleaned_data.get('motivation')
         user = request.user.username
-        add_motivation(motivation, user)
+        if request.user.is_anonymous:
+            visibility = False
+            send_motivation_to_messenger(motivation)
+        else:
+            visibility = True
+        add_motivation(motivation, user, visibility)
         return redirect('main')
     context = {
         'form': form
@@ -98,12 +103,17 @@ def get_data(request):
     return render(request, template, context)
 
 
-def add_motivation(motivation, user):
+def add_motivation(motivation, user, visibility):
     headers = {
-        'Authorization': os.getenv('API-KEY', '')
+        'Authorization': os.getenv('API_KEY', '')
     }
-    url = os.getenv('API-URL', '')
+    url = os.getenv('API_URL', '')
     response = requests.post(url,  headers=headers, json={
         'nickname': user,
-        'motivation': motivation
+        'motivation': motivation,
+        'is_visible': visibility
     })
+    return response
+def send_motivation_to_messenger(motivation):
+    pass
+#TODO: Add function logic after solution what messenger will be use.
