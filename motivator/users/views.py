@@ -36,27 +36,23 @@ class Register(CreateView):
         return render(request, self.template_name, context)
 
 
-class MotivationList(ListView):
-    
-    template_name = 'main.html'
-
-    def get(self, request):
-        headers = {
-            'Authorization': os.getenv('API_KEY', '')
-        }
-        params = {
-            'page' : request.GET.get('page')
-        }
-        url = os.getenv('API_URL', '')
-        response = requests.get(url, headers=headers, params=params)
-        page_obj = response.json()
-        motivations = page_obj['results']
-        pages_count = ceil(page_obj['count']/5)
-        context = {
-            'motivations': motivations,
-            'range': range(1, pages_count+1)
-        }
-        return render(request, self.template_name, context)
+def get_motivations(request):
+    headers = {
+        'Authorization': os.getenv('API_KEY', '')
+    }
+    params = {
+        'page' : request.GET.get('page')
+    }
+    url = os.getenv('API_URL', '')
+    response = requests.get(url, headers=headers, params=params)
+    page_obj = response.json()
+    motivations = page_obj['results']
+    pages_count = ceil(page_obj['count']/5)
+    context = {
+        'motivations': motivations,
+        'range': range(1, pages_count+1)
+    }
+    return render(request, 'main.html', context)
 
 class DetailMotivationList(ListView):
     template_name = 'motivation_id.html'
