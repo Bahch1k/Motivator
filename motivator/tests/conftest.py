@@ -20,13 +20,6 @@ def user():
 
 
 @pytest.fixture
-def header():
-    header = {
-        'Authorization': os.getenv('API_KEY')
-    }
-    return header
-
-@pytest.fixture
 def url():
     url = os.getenv('API_URL')
     return url
