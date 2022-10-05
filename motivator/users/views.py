@@ -1,5 +1,8 @@
+
+from django.core.cache import cache
 from math import ceil
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.generic import CreateView, ListView
 from .forms import UserCreationForm, MotivationCreateForm
 from django.contrib.auth import authenticate, login
@@ -29,7 +32,7 @@ class Register(CreateView):
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect('home')
+            return redirect('http://127.0.0.1:8000/users/motivations/?page=1')
         context = {
             'form': form
         }
@@ -38,21 +41,29 @@ class Register(CreateView):
 
 def get_motivations(request):
     headers = {
-        'Authorization': os.getenv('API_KEY', '')
+        'Authorization': os.getenv('API_KEY', ''),
+        'If-None-Match': cache.get('etag'+str(request.GET.get('page')))
     }
     params = {
         'page' : request.GET.get('page')
     }
     url = os.getenv('API_URL', '')
     response = requests.get(url, headers=headers, params=params)
-    page_obj = response.json()
-    motivations = page_obj['results']
-    pages_count = ceil(page_obj['count']/5)
-    context = {
-        'motivations': motivations,
-        'range': range(1, pages_count+1)
-    }
-    return render(request, 'main.html', context)
+    if response.status_code == 200:
+        page_obj = response.json()
+        motivations = page_obj['results']
+        pages_count = ceil(page_obj['count']/5)
+        etag = response.headers['ETag']
+        cache.set('etag' + str(request.GET.get('page')), etag)
+        context = {
+            'motivations': motivations,
+            'range': range(1, pages_count+1)
+        }
+        cache.set('context'+ str(request.GET.get('page')), context)
+        return render(request, 'main.html', context)
+    else:
+        context = cache.get('context'+ str(request.GET.get('page')))
+        return render(request, 'main.html', context=context)
 
 class DetailMotivationList(ListView):
     template_name = 'motivation_id.html'
@@ -95,7 +106,7 @@ def get_form_data(request):
         else:
             visibility = True
         add_motivation(motivation, user, visibility)
-        return redirect('main')
+        return redirect('http://127.0.0.1:8000/users/motivations/?page=1')
     context = {
         'form': form
     }

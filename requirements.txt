@@ -8,3 +8,4 @@ debugpy==1.6.3
 python-dotenv==0.20.0
 pytest-django==4.5.2
 requests_mock
+redis
