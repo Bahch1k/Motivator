@@ -12,6 +12,7 @@ This is a web service designed for display results of requests to [Motivation AP
 
 * The necessary parts of the service are placed in Docker containers linked together in a `docker-compose` file.
 * The service implemented caching of a page with the list of motivations using Redis as a backend.
+* The sending motivations to the API is logged.
 * It is possible to test requests to the API using the unittests which are available in the project (the `pytest` library is used).
 
 ### Attention
