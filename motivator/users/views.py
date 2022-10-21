@@ -6,8 +6,11 @@ from django.contrib.auth import authenticate, login
 import requests
 import os
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
+
+logger = logging.getLogger('main')
 
 class Register(CreateView):
     template_name = 'registration/register.html'
@@ -104,6 +107,10 @@ def get_form_data(request):
 
 
 def add_motivation(motivation, user, visibility):
+    if user != '':
+        logger.info(f'Motivation from {user} saved to database.')
+    else:
+        logger.info('Motivation saved to database but hidden.')
     headers = {
         'Authorization': os.getenv('API_KEY', '')
     }
@@ -115,5 +122,5 @@ def add_motivation(motivation, user, visibility):
     })
     return response
 def send_motivation_to_messenger(motivation):
-    pass
+    logger.info('Motivation sends to messenger')
 #TODO: Add function logic after solution what messenger will be use.
