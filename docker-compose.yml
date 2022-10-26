@@ -15,13 +15,14 @@ services:
   app-users:
     container_name: motivator_users
     build: .
-    command: sh -c "python motivator/manage.py migrate && python motivator/manage.py runserver 0.0.0.0:8000"
+    command: sh -c "pip install -r requirements.txt && python motivator/manage.py migrate && python motivator/manage.py runserver 0.0.0.0:8000"
 
     depends_on:
       - db-pg
       
     volumes:
-      - ./motivator:/motivator_users
+      - ./:/var/www/app/
+      - ./logs:/var/log
 
     ports:
       - 8000:8000

@@ -6,8 +6,11 @@ from django.contrib.auth import authenticate, login
 import requests
 import os
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
+
+logger = logging.getLogger('main')
 
 class Register(CreateView):
     template_name = 'registration/register.html'
@@ -33,27 +36,23 @@ class Register(CreateView):
         return render(request, self.template_name, context)
 
 
-class MotivationList(ListView):
-    
-    template_name = 'main.html'
-
-    def get(self, request):
-        headers = {
-            'Authorization': os.getenv('API_KEY', '')
-        }
-        params = {
-            'page' : request.GET.get('page')
-        }
-        url = os.getenv('API_URL', '')
-        response = requests.get(url, headers=headers, params=params)
-        page_obj = response.json()
-        motivations = page_obj['results']
-        pages_count = ceil(page_obj['count']/5)
-        context = {
-            'motivations': motivations,
-            'range': range(1, pages_count+1)
-        }
-        return render(request, self.template_name, context)
+def get_motivations(request):
+    headers = {
+        'Authorization': os.getenv('API_KEY', '')
+    }
+    params = {
+        'page' : request.GET.get('page')
+    }
+    url = os.getenv('API_URL', '')
+    response = requests.get(url, headers=headers, params=params)
+    page_obj = response.json()
+    motivations = page_obj['results']
+    pages_count = ceil(page_obj['count']/5)
+    context = {
+        'motivations': motivations,
+        'range': range(1, pages_count+1)
+    }
+    return render(request, 'main.html', context)
 
 class DetailMotivationList(ListView):
     template_name = 'motivation_id.html'
@@ -104,6 +103,10 @@ def get_form_data(request):
 
 
 def add_motivation(motivation, user, visibility):
+    if user != '':
+        logger.info(f'Motivation from {user} saved to database.')
+    else:
+        logger.info('Motivation saved to database but hidden.')
     headers = {
         'Authorization': os.getenv('API_KEY', '')
     }
@@ -115,5 +118,5 @@ def add_motivation(motivation, user, visibility):
     })
     return response
 def send_motivation_to_messenger(motivation):
-    pass
+    logger.info('Motivation sends to messenger')
 #TODO: Add function logic after solution what messenger will be use.
