@@ -1,9 +1,13 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm   # type: ignore
+
+# import from third party libraries
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import User
+
+# import from current project
+from django import forms
 
 User = get_user_model()
+
 
 class UserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
@@ -11,7 +15,7 @@ class UserCreationForm(UserCreationForm):
 
 
 class MotivationCreateForm(forms.Form):
-    motivation = forms.CharField(widget =forms.Textarea(attrs={
+    motivation = forms.CharField(widget=forms.Textarea(attrs={
             'class': 'form-control mt-4',
             'placeholder': 'Напишите свою мотивацию.'
                     }))
