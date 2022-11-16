@@ -3,6 +3,7 @@ from math import ceil
 import os
 
 # import from third party libraries
+from django.http.response import HttpResponse
 from django.core.cache import cache
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, ListView
@@ -68,11 +69,17 @@ def get_motivations(request):
     url = os.getenv('API_URL', '')
     response = requests.get(url, headers=headers, params=params)
 
-    if response.status_code == 200:
-        # get all motivations from response and setup simple pagination.
+    if response.status_code == 404:
+        return HttpResponse('Something went wrong!')
+
+    elif response.status_code == 200:
+        # get all motivations from response.
         page_obj = response.json()
         motivations = page_obj['results']
-        pages_count = ceil(page_obj['count']/5)
+
+        # setup range for pages in pagination
+        pages_range = range(int(request.GET.get('page')), int(request.GET.get('page')) + 6)
+
 
         # ETag header for caching pages
         etag = response.headers['ETag']
@@ -80,7 +87,7 @@ def get_motivations(request):
 
         context = {
             'motivations': motivations,
-            'range': range(1, pages_count+1)
+            'range': pages_range
         }
         
         # caching context from response
