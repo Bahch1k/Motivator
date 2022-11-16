@@ -4,5 +4,8 @@ djangorestframework==3.13.1
 Pillow==9.1.1
 psycopg2-binary==2.9.3
 requests==2.28.1
-debugpy==1.6.2
+debugpy==1.6.3
 python-dotenv==0.20.0
+pytest-django==4.5.2
+requests_mock
+redis

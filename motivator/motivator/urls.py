@@ -13,9 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+# import from third party libraries
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
+
+# import from current project
 from users.views import RandomMotivation
 
 urlpatterns = [
@@ -23,4 +25,3 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('', RandomMotivation.as_view(), name='home'),
 ]
-
